@@ -121,8 +121,8 @@ def close() {
 
 // 
 private http_command(uri) {
-	log.debug("Executing hubaction ${uri} on " + getHostAddress())
-	device.setDeviceNetworkId(MacID)
+	log.debug("Executing hubaction ${uri} on " + getHostAddress() + " DeviceID: " + getMacID())
+	device.setDeviceNetworkId(getMacID())
     
     def hubAction = new physicalgraph.device.HubAction(
     	[
@@ -130,7 +130,7 @@ private http_command(uri) {
         	path: uri,
         	headers: [HOST:getHostAddress()]
         ],
-        MacID
+        getMacID()
         )
 
     return hubAction
@@ -144,6 +144,7 @@ def refresh() {
 
 //
 def getDoorsState() {
+	log.debug("Device ID: " + device.deviceNetworkId)
 	def cmds = []
     log.debug("Fetching door states")
     cmds << http_command("/status")
@@ -153,6 +154,9 @@ def getDoorsState() {
 
 //
 def parse(String description) {
+
+	// log.debug "Parsing '${description}'"
+
 	def msg = parseLanMessage(description)
 
     def headersAsString = msg.header // => headers as a string
@@ -163,8 +167,6 @@ def parse(String description) {
     def xml = msg.xml                // => any XML included in response body, as a document tree structure
     def data = msg.data              // => either JSON or XML in response body (whichever is specified by content-type header in response)
 	
-    log.debug(data)
-	 
     try {
 		def object = new groovy.json.JsonSlurper().parseText(body)
 	            
@@ -189,7 +191,7 @@ def parse(String description) {
         sendEvent(name: "door", value: state.overall, isStateChange: true)
     }
     catch (Exception e) {
-    	//log.error(e)
+    	log.error("Cannot fetch garage door states: " + e)
     }
 }
 
