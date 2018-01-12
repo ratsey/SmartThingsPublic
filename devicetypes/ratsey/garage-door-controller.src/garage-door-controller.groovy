@@ -58,7 +58,7 @@ def installed() {
 def updated() {
     log.debug "updated"
     unschedule(getDoorsState)
-    runEvery5Minutes(getDoorsState)
+    runEvery1Minute(getDoorsState)
     runIn(1, getDoorsState)
 }
 

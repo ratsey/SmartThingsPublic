@@ -175,7 +175,7 @@ private http_command(uri) {
 
 def tvAction(action) {
 	def cmds = []
-	cmds << http_command("/action/{action}")
+	cmds << http_command("/action/" + action)
     log.debug cmds
     
     sendHubCommand(cmds)
